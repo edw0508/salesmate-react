@@ -2,41 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* CRM Design System - Professional Modern Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Core Background & Foreground */
+    --background: 250 100% 99%;
     --foreground: 222.2 84% 4.9%;
 
+    /* Card System */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
+    /* Popover System */
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary Purple Theme (Matching Reference) */
+    --primary: 246 85% 63%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 246 85% 58%;
+    --primary-light: 246 85% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary Blue Theme */
+    --secondary: 213 94% 68%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 213 94% 63%;
+    --secondary-light: 213 94% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 76% 95%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 92% 95%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --danger: 0 84% 60%;
+    --danger-foreground: 0 0% 100%;
+    --danger-light: 0 84% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Neutral System */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --radius: 0.5rem;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 9% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border & Input */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 246 85% 63%;
+
+    /* Modern Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(246 85% 63%) 0%, hsl(213 94% 68%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 46%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(45 92% 55%) 100%);
+    --gradient-danger: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(348 84% 65%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 20px rgb(99 102 241 / 0.3);
+
+    /* Animations */
+    --animation-fast: 150ms ease-out;
+    --animation-normal: 250ms ease-out;
+    --animation-slow: 350ms ease-out;
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,6 +95,7 @@ All colors MUST be HSL.
   }
 
   .dark {
+    /* Dark Theme */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -65,11 +105,27 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 246 85% 63%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 246 85% 58%;
+    --primary-light: 246 25% 15%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 213 94% 68%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 213 94% 63%;
+    --secondary-light: 213 25% 15%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 25% 15%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 25% 15%;
+
+    --danger: 0 84% 60%;
+    --danger-foreground: 0 0% 100%;
+    --danger-light: 0 25% 15%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -82,7 +138,7 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 246 85% 63%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +156,74 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* CRM Component Utilities */
+  .stat-card {
+    @apply bg-card rounded-xl p-6 shadow-md border border-border/50 transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
+  }
+
+  .stat-card-primary {
+    @apply stat-card bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20;
+  }
+
+  .stat-card-success {
+    @apply stat-card bg-gradient-to-br from-success/10 to-success/5 border-success/20;
+  }
+
+  .stat-card-warning {
+    @apply stat-card bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20;
+  }
+
+  .stat-card-danger {
+    @apply stat-card bg-gradient-to-br from-danger/10 to-danger/5 border-danger/20;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200;
+  }
+
+  .sidebar-item-active {
+    @apply sidebar-item bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-approved {
+    @apply status-badge bg-success/10 text-success border border-success/20;
+  }
+
+  .status-pending {
+    @apply status-badge bg-warning/10 text-warning border border-warning/20;
+  }
+
+  .status-rejected {
+    @apply status-badge bg-danger/10 text-danger border border-danger/20;
+  }
+
+  .status-contacted {
+    @apply status-badge bg-secondary/10 text-secondary border border-secondary/20;
   }
 }
