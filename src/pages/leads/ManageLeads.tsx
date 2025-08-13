@@ -7,7 +7,8 @@ import {
   Star,
   Filter,
   Download,
-  Plus
+  Plus,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,20 +30,26 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import Header from '@/components/layout/Header';
+import StatusUpdateModal from '@/components/leads/StatusUpdateModal';
 import { MOCK_LEADS } from '@/data/mockData';
-import { Lead } from '@/types/crm';
+import { Lead, StatusChange } from '@/types/crm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const ManageLeads: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [leads, setLeads] = useState(MOCK_LEADS);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
   // Filter leads based on user role
-  const allLeads = user?.role === 'admin' ? MOCK_LEADS : MOCK_LEADS.filter(lead => lead.ownerId === user?.id);
+  const allLeads = user?.role === 'admin' ? leads : leads.filter(lead => lead.ownerId === user?.id);
 
   // Apply filters
   const filteredLeads = allLeads.filter(lead => {
@@ -99,6 +106,36 @@ const ManageLeads: React.FC = () => {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleStatusUpdate = (leadId: string, newStatus: string, notes: string) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => {
+        if (lead.id === leadId) {
+          const statusChange: StatusChange = {
+            id: Date.now().toString(),
+            fromStatus: lead.status,
+            toStatus: newStatus,
+            changedBy: user?.name || 'Unknown',
+            changedAt: new Date().toISOString(),
+            notes
+          };
+
+          return {
+            ...lead,
+            status: newStatus as Lead['status'],
+            updatedAt: new Date().toISOString(),
+            statusHistory: [statusChange, ...lead.statusHistory]
+          };
+        }
+        return lead;
+      })
+    );
+  };
+
+  const handleOpenStatusModal = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsStatusModalOpen(true);
   };
 
   return (
@@ -222,6 +259,15 @@ const ManageLeads: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleOpenStatusModal(lead)}
+                            title="Update Progress"
+                          >
+                            <Clock className="w-4 h-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -251,6 +297,14 @@ const ManageLeads: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Status Update Modal */}
+        <StatusUpdateModal
+          lead={selectedLead}
+          isOpen={isStatusModalOpen}
+          onClose={() => setIsStatusModalOpen(false)}
+          onUpdate={handleStatusUpdate}
+        />
       </div>
     </div>
   );
