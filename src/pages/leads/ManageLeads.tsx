@@ -31,11 +31,16 @@ import {
 } from '@/components/ui/select';
 import Header from '@/components/layout/Header';
 import StatusUpdateModal from '@/components/leads/StatusUpdateModal';
+import ViewLeadModal from '@/components/leads/ViewLeadModal';
+import EditLeadModal from '@/components/leads/EditLeadModal';
+import FollowUpModal from '@/components/leads/FollowUpModal';
+import DeleteConfirmModal from '@/components/leads/DeleteConfirmModal';
 import { MOCK_LEADS } from '@/data/mockData';
-import { Lead, StatusChange } from '@/types/crm';
+import { Lead, StatusChange, FollowUp } from '@/types/crm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { exportLeadsToCSV, exportLeadsToJSON } from '@/utils/exportUtils';
 
 const ManageLeads: React.FC = () => {
   const { user } = useAuth();
@@ -45,8 +50,14 @@ const ManageLeads: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [leads, setLeads] = useState(MOCK_LEADS);
+  
+  // Modal states
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Filter leads based on user role
   const allLeads = user?.role === 'admin' ? leads : leads.filter(lead => lead.ownerId === user?.id);
@@ -133,9 +144,67 @@ const ManageLeads: React.FC = () => {
     );
   };
 
+  const handleLeadUpdate = (leadId: string, updatedData: Partial<Lead>) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => 
+        lead.id === leadId ? { ...lead, ...updatedData } : lead
+      )
+    );
+  };
+
+  const handleFollowUpSchedule = (leadId: string, followUpDate: string, notes: string) => {
+    setLeads(prevLeads => 
+      prevLeads.map(lead => 
+        lead.id === leadId 
+          ? { 
+              ...lead, 
+              followUpDate,
+              updatedAt: new Date().toISOString()
+            } 
+          : lead
+      )
+    );
+    
+    // You could also create a follow-up record here if needed
+    // This would typically be saved to your backend/database
+  };
+
+  const handleLeadDelete = (leadId: string) => {
+    setLeads(prevLeads => prevLeads.filter(lead => lead.id !== leadId));
+  };
+
+  const handleExport = () => {
+    exportLeadsToCSV(filteredLeads, 'crm-leads');
+    toast({
+      title: "Export Complete",
+      description: `${filteredLeads.length} leads exported successfully.`,
+    });
+  };
+
+  // Modal handlers
   const handleOpenStatusModal = (lead: Lead) => {
     setSelectedLead(lead);
     setIsStatusModalOpen(true);
+  };
+
+  const handleOpenViewModal = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsViewModalOpen(true);
+  };
+
+  const handleOpenEditModal = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsEditModalOpen(true);
+  };
+
+  const handleOpenFollowUpModal = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsFollowUpModalOpen(true);
+  };
+
+  const handleOpenDeleteModal = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsDeleteModalOpen(true);
   };
 
   return (
@@ -192,7 +261,11 @@ const ManageLeads: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleExport}
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Export
                 </Button>
@@ -268,17 +341,41 @@ const ManageLeads: React.FC = () => {
                           >
                             <Clock className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleOpenViewModal(lead)}
+                            title="View Details"
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleOpenEditModal(lead)}
+                            title="Edit Lead"
+                          >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleOpenFollowUpModal(lead)}
+                            title="Schedule Follow-up"
+                          >
                             <Calendar className="w-4 h-4" />
                           </Button>
                           {user?.role === 'admin' && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-danger hover:text-danger">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-danger hover:text-danger"
+                              onClick={() => handleOpenDeleteModal(lead)}
+                              title="Delete Lead"
+                            >
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           )}
@@ -298,12 +395,39 @@ const ManageLeads: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Status Update Modal */}
+        {/* Modals */}
         <StatusUpdateModal
           lead={selectedLead}
           isOpen={isStatusModalOpen}
           onClose={() => setIsStatusModalOpen(false)}
           onUpdate={handleStatusUpdate}
+        />
+        
+        <ViewLeadModal
+          lead={selectedLead}
+          isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)}
+        />
+        
+        <EditLeadModal
+          lead={selectedLead}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleLeadUpdate}
+        />
+        
+        <FollowUpModal
+          lead={selectedLead}
+          isOpen={isFollowUpModalOpen}
+          onClose={() => setIsFollowUpModalOpen(false)}
+          onSchedule={handleFollowUpSchedule}
+        />
+        
+        <DeleteConfirmModal
+          lead={selectedLead}
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onDelete={handleLeadDelete}
         />
       </div>
     </div>
